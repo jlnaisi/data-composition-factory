@@ -36,7 +36,7 @@ public class CollectionData<D> implements Data<D, Collection<D>> {
      */
     @Override
     public <S, M> CollectionData<D> from(Source<D, S, M> source) {
-        if (Objects.nonNull(source)) {
+        if (Objects.nonNull(source) && source.enabled()) {
             this.sourceList.add(source);
         }
         return this;
@@ -51,27 +51,27 @@ public class CollectionData<D> implements Data<D, Collection<D>> {
         if (Objects.isNull(data)) {
             return;
         }
+        if (CollUtil.isEmpty(sourceList)) {
+            return;
+        }
         Map<String, Field> dataFiledNameMap = ReflectUtil.getStreamCacheFields(CollUtil.getFirst(data).getClass(), true, field -> field.setAccessible(true)).collect(Collectors.toMap(Field::getName, v -> v));
         for (D datum : data) {
             for (Source<D, ?, ?> source : sourceList) {
-                Collection<?> sourceData = (Collection<?>) source.getSourceData();
-                if (CollUtil.isNotEmpty(sourceData)) {
-                    Map<CompositionKey, Set<CompositionValue<?>>> compositionMap = (Map<CompositionKey, Set<CompositionValue<?>>>) source.getCompositionMap();
-                    compositionMap.forEach((BiConsumer<? super CompositionKey, ? super Set<? extends CompositionValue<?>>>) (compositionKey, compositionValues) -> {
-                        String dataKeyFieldName = compositionKey.getDataKeyFieldName();
-                        Object fieldValue = ReflectUtil.getFieldValue(dataFiledNameMap.get(dataKeyFieldName), datum);
-                        for (CompositionValue<?> compositionValue : compositionValues) {
-                            Map<Object, ? extends List<?>> valueGroupBy = compositionValue.getValueGroupBy();
-                            Field sourceValuefield = source.getSourceFieldMap().get(compositionValue.getSourceValueFieldName());
-                            Field dataValueField = dataFiledNameMap.get(compositionValue.getDataValueFieldName());
-                            List<?> values = ReflectUtil.unfold(sourceValuefield, valueGroupBy.get(fieldValue));
-                            if (Objects.isNull(values)) {
-                                break;
-                            }
-                            ReflectUtil.setFieldValue(dataValueField, datum, values);
+                Map<CompositionKey, Set<CompositionValue<?>>> compositionMap = (Map<CompositionKey, Set<CompositionValue<?>>>) source.getCompositionMap();
+                compositionMap.forEach((BiConsumer<? super CompositionKey, ? super Set<? extends CompositionValue<?>>>) (compositionKey, compositionValues) -> {
+                    String dataKeyFieldName = compositionKey.getDataKeyFieldName();
+                    Object fieldValue = ReflectUtil.getFieldValue(dataFiledNameMap.get(dataKeyFieldName), datum);
+                    for (CompositionValue<?> compositionValue : compositionValues) {
+                        Map<Object, ? extends List<?>> valueGroupBy = compositionValue.getValueGroupBy();
+                        Field sourceValuefield = source.getSourceFieldMap().get(compositionValue.getSourceValueFieldName());
+                        Field dataValueField = dataFiledNameMap.get(compositionValue.getDataValueFieldName());
+                        List<?> values = ReflectUtil.unfold(sourceValuefield, valueGroupBy.get(fieldValue));
+                        if (Objects.isNull(values)) {
+                            break;
                         }
-                    });
-                }
+                        ReflectUtil.setFieldValue(dataValueField, datum, values);
+                    }
+                });
             }
         }
     }

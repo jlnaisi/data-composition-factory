@@ -1,6 +1,7 @@
 package data.composition.factory;
 
 import data.composition.factory.data.CollectionData;
+import data.composition.factory.data.SingleData;
 
 import java.util.Collection;
 
@@ -23,5 +24,9 @@ public interface DataCompositionFactory {
      */
     static <D> CollectionData<D> data(Collection<D> data) {
         return new CollectionData<>(data);
+    }
+
+    static <D> SingleData<D> data(D data) {
+        return new SingleData<>(data);
     }
 }

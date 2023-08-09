@@ -16,6 +16,7 @@ import java.util.Set;
  * @since 2023-07-25
  */
 public interface Source<D, S, M> {
+    boolean enabled();
 
     /**
      * 键,用来指定具有数据关系的键
@@ -28,7 +29,7 @@ public interface Source<D, S, M> {
 
     void addSourceKeyMap(SourceKeyMap<D, S, M> sourceKeyMap);
 
-    List<SourceKeyMap<D, S, Collection<S>>> getSourceKeyMapList();
+    List<SourceKeyMap<D, S, M>> getSourceKeyMapList();
 
     M getSourceData();
 
