@@ -22,7 +22,7 @@ public class CollectionSourceKeyMap<D, S> implements SourceKeyMap<D, S, Collecti
         this.source = source;
         this.keyDataField = keyDataField;
         this.keySourceDataField = keySourceDataField;
-        source.addSourceKeyMap(this);
+        source.getSourceKeyMapList().add(this);
     }
 
     @Override

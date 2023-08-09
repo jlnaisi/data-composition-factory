@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class DataFactoryTest {
     public static void main(String[] args) {
-//        allCollectTest();
+        allCollectTest();
         dataCollectTest();
     }
 
@@ -26,7 +26,7 @@ public class DataFactoryTest {
         studentScore.setName("张三");
         studentScore.setScore("100");
         studentScore.setIndex(Arrays.asList(1, 2, 3));
-        for (int i = 1; i <= 10000; i++) {
+        for (int i = 1; i <= 10; i++) {
             Student student = new Student();
             student.setId(i);
             students.add(student);
@@ -43,7 +43,7 @@ public class DataFactoryTest {
     private static void allCollectTest() {
         List<Student> students = new ArrayList<>();
         List<StudentScore> studentScores = new ArrayList<>();
-        for (int i = 1; i <= 10000; i++) {
+        for (int i = 1; i <= 10; i++) {
             Student student = new Student();
             student.setId(i);
             students.add(student);

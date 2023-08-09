@@ -19,7 +19,7 @@ public class SingleSourceKeyMap<D, S> implements SourceKeyMap<D, S, S> {
         this.source = source;
         this.keyDataField = keyDataField;
         this.keySourceDataField = keySourceDataField;
-        source.addSourceKeyMap(this);
+        source.getSourceKeyMapList().add(this);
     }
 
     @Override
