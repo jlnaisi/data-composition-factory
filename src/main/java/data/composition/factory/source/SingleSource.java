@@ -9,15 +9,16 @@ import data.composition.factory.util.ReflectUtil;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
  * @author zhangjinyu
  * @since 2023-08-09
  */
-public class SingleSource<D, S> implements Source<D, S, S> {
+public class SingleSource<D, S> implements Source<D, S, S, FieldFunction<D, ?>, FieldFunction<S, ?>> {
     final S source;
-    private final List<SourceKeyMap<D, S, S>> sourceKeyMapList;
+    private final List<SourceKeyMap<D, S, S, FieldFunction<D, ?>, FieldFunction<S, ?>>> sourceKeyMapList;
     private Map<String, Field> sourceFieldMap;
     private Map<CompositionKey, Set<CompositionValue<? extends S>>> compositionMap;
 
@@ -36,7 +37,7 @@ public class SingleSource<D, S> implements Source<D, S, S> {
      * @return 数据源对象 {@link Source}
      */
     @SuppressWarnings("unused")
-    public static <D, S> Source<D, S, S> create(S source, Class<D> clazz) {
+    public static <D, S> Source<D, S, S, FieldFunction<D, ?>, FieldFunction<S, ?>> create(S source, Class<D> clazz) {
         return new SingleSource<>(source);
     }
 
@@ -46,12 +47,13 @@ public class SingleSource<D, S> implements Source<D, S, S> {
     }
 
     @Override
-    public SourceKeyMap<D, S, S> key(FieldFunction<D, ?> dataField, FieldFunction<S, ?> sourceField) {
+    public SourceKeyMap<D, S, S, FieldFunction<D, ?>, FieldFunction<S, ?>> key(FieldFunction<D, ?> dataField, FieldFunction<S, ?> sourceField) {
         return new SingleSourceKeyMap<>(this, dataField, sourceField);
     }
 
+
     @Override
-    public List<SourceKeyMap<D, S, S>> getSourceKeyMapList() {
+    public List<SourceKeyMap<D, S, S, FieldFunction<D, ?>, FieldFunction<S, ?>>> getSourceKeyMapList() {
         return sourceKeyMapList;
     }
 
@@ -69,9 +71,9 @@ public class SingleSource<D, S> implements Source<D, S, S> {
     }
 
     @Override
-    public Map<Object, List<S>> createValueGroupBy(String sourceDataKeyFieldName) {
-        Map<Object, List<S>> valueGroupBy = new HashMap<>(2, 1);
-        valueGroupBy.put(ReflectUtil.getFieldValue(getSourceFieldMap().get(sourceDataKeyFieldName), getSourceData()), Collections.singletonList(getSourceData()));
+    public Map<Object, S> createValueGroupBy(String sourceDataKeyFieldName) {
+        Map<Object, S> valueGroupBy = new HashMap<>(2, 1);
+        valueGroupBy.put(ReflectUtil.getFieldValue(getSourceFieldMap().get(sourceDataKeyFieldName), getSourceData()), getSourceData());
         return valueGroupBy;
     }
 

@@ -14,8 +14,8 @@ import java.util.Objects;
  */
 @Data
 @AllArgsConstructor
-public class CompositionValue<S> {
+public class CompositionValue<M> {
     private String dataValueFieldName;
     private String sourceValueFieldName;
-    private Map<Object, List<S>> valueGroupBy;
+    private Map<Object, M> valueGroupBy;
 }

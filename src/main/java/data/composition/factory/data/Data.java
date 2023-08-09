@@ -2,6 +2,8 @@ package data.composition.factory.data;
 
 import data.composition.factory.source.Source;
 
+import java.util.function.Function;
+
 /**
  * 数据</br>
  * 泛型:D 为数据类型,C为本类子类实现类型
@@ -10,7 +12,7 @@ import data.composition.factory.source.Source;
  * @since 2023-07-25
  */
 public interface Data<D, C> {
-    <S, M> Data<D, C> from(Source<D, S, M> source);
+    <S, M, DF extends Function<D, ?>, VF extends Function<S, ?>> Data<D, C> from(Source<D, S, M, DF, VF> source);
 
-    void composition() throws IllegalAccessException;
+    void composition();
 }

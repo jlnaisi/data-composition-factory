@@ -177,17 +177,25 @@ public class ReflectUtil {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<?> unfold(Field sourceValuefield, List<?> list) {
-        if(Objects.isNull(list)){
+    public static List<?> unfold(Field sourceValuefield, Object obj) {
+        if (Objects.isNull(obj)) {
             return null;
         }
         if (Collection.class.isAssignableFrom(sourceValuefield.getType())) {
-            return list.stream().flatMap(o -> {
-                Object fieldValue = ReflectUtil.getFieldValue(sourceValuefield, o);
-                return fieldValue == null ? Stream.empty() : ((List<Object>) fieldValue).stream();
-            }).collect(Collectors.toList());
+            if (sourceValuefield.getType().isAssignableFrom(obj.getClass())) {
+                List<Object> list = (List<Object>) obj;
+                return list.stream().flatMap(o -> {
+                    Object fieldValue = ReflectUtil.getFieldValue(sourceValuefield, o);
+                    return fieldValue == null ? Stream.empty() : ((List<Object>) fieldValue).stream();
+                }).collect(Collectors.toList());
+            } else {
+                return Collections.singletonList(getFieldValue(sourceValuefield, obj));
+            }
         } else {
-            return list.stream().map((Function<Object, Object>) o -> ReflectUtil.getFieldValue(sourceValuefield, o)).toList();
+            if (obj instanceof Collection<?> objList) {
+                return objList.stream().map((Function<Object, Object>) o -> getFieldValue(sourceValuefield, o)).toList();
+            }
+            return Collections.singletonList(getFieldValue(sourceValuefield, obj));
         }
     }
 }

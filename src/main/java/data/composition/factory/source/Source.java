@@ -3,7 +3,6 @@ package data.composition.factory.source;
 import cn.hutool.core.collection.CollUtil;
 import data.composition.factory.bean.CompositionKey;
 import data.composition.factory.bean.CompositionValue;
-import data.composition.factory.function.FieldFunction;
 import data.composition.factory.keymap.SourceKeyMap;
 import data.composition.factory.util.ReflectUtil;
 
@@ -15,7 +14,7 @@ import java.util.function.Function;
  * @author zhangjinyu
  * @since 2023-07-25
  */
-public interface Source<D, S, M> {
+public interface Source<D, S, M, DF extends Function<D, ?>, VF extends Function<S, ?>> {
     boolean enabled();
 
     /**
@@ -25,19 +24,19 @@ public interface Source<D, S, M> {
      * @param sourceField 数据源字段
      * @return 数据源键映射对象 {@link SourceKeyMap}
      */
-    SourceKeyMap<D, S, M> key(FieldFunction<D, ?> dataField, FieldFunction<S, ?> sourceField);
+    SourceKeyMap<D, S, M, DF, VF> key(DF dataField, VF sourceField);
 
-    List<SourceKeyMap<D, S, M>> getSourceKeyMapList();
+    List<SourceKeyMap<D, S, M, DF, VF>> getSourceKeyMapList();
 
     M getSourceData();
 
     Map<String, Field> getSourceFieldMap();
 
-    default Map<CompositionKey, Set<CompositionValue<? extends S>>> createCompositionMap() {
-        Map<CompositionKey, Set<CompositionValue<? extends S>>> compositionMap = new HashMap<>();
-        List<SourceKeyMap<D, S, M>> sourceKeyMapList = getSourceKeyMapList().stream().filter(dssSourceKeyMap -> Objects.nonNull(dssSourceKeyMap.getDataKeyField()) && Objects.nonNull(dssSourceKeyMap.getDataValueField()) && Objects.nonNull(dssSourceKeyMap.getSourceDataKeyField()) && Objects.nonNull(dssSourceKeyMap.getSourceDataValueField())).toList();
+    default Map<CompositionKey, Set<CompositionValue<? extends M>>> createCompositionMap() {
+        Map<CompositionKey, Set<CompositionValue<? extends M>>> compositionMap = new HashMap<>();
+        List<SourceKeyMap<D, S, M, DF, VF>> sourceKeyMapList = getSourceKeyMapList().stream().filter(dssSourceKeyMap -> Objects.nonNull(dssSourceKeyMap.getDataKeyField()) && Objects.nonNull(dssSourceKeyMap.getDataValueField()) && Objects.nonNull(dssSourceKeyMap.getSourceDataKeyField()) && Objects.nonNull(dssSourceKeyMap.getSourceDataValueField())).toList();
         if (CollUtil.isNotEmpty(sourceKeyMapList)) {
-            for (SourceKeyMap<D, S, M> dSourceKeyMap : sourceKeyMapList) {
+            for (SourceKeyMap<D, S, M, ? extends Function<D, ?>, ? extends Function<S, ?>> dSourceKeyMap : sourceKeyMapList) {
                 Function<D, ?> dataKeyField = dSourceKeyMap.getDataKeyField();
                 Function<?, ?> sourceDataKeyField = dSourceKeyMap.getSourceDataKeyField();
                 Function<D, ?> dataValueField = dSourceKeyMap.getDataValueField();
@@ -47,8 +46,8 @@ public interface Source<D, S, M> {
                 String dataValueFieldName = ReflectUtil.getFieldName(dataValueField);
                 String sourceDataValueFieldName = ReflectUtil.getFieldName(sourceDataValueField);
                 CompositionKey compositionKey = new CompositionKey(dataKeyFieldName, sourceDataKeyFieldName);
-                Set<CompositionValue<? extends S>> compositionValues = compositionMap.get(compositionKey);
-                CompositionValue<S> compositionValue = new CompositionValue<>(dataValueFieldName, sourceDataValueFieldName, createValueGroupBy(sourceDataKeyFieldName));
+                Set<CompositionValue<? extends M>> compositionValues = compositionMap.get(compositionKey);
+                CompositionValue<M> compositionValue = new CompositionValue<>(dataValueFieldName, sourceDataValueFieldName, createValueGroupBy(sourceDataKeyFieldName));
                 if (Objects.isNull(compositionValues)) {
                     compositionValues = new HashSet<>();
                     compositionMap.put(compositionKey, compositionValues);
@@ -59,7 +58,7 @@ public interface Source<D, S, M> {
         return compositionMap;
     }
 
-    Map<Object, List<S>> createValueGroupBy(String sourceDataKeyFieldName);
+    Map<Object, M> createValueGroupBy(String sourceDataKeyFieldName);
 
-    Map<CompositionKey, Set<CompositionValue<? extends S>>> getCompositionMap();
+    Map<CompositionKey, Set<CompositionValue<? extends M>>> getCompositionMap();
 }

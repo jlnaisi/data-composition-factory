@@ -9,7 +9,7 @@ import java.util.function.Function;
  * @author zhangjinyu
  * @since 2023-07-25
  */
-public interface SourceKeyMap<D, S, M> {
+public interface SourceKeyMap<D, S, M, DF extends Function<D, ?>, VF extends Function<S, ?>> {
     /**
      * 数据赋值
      *
@@ -17,14 +17,14 @@ public interface SourceKeyMap<D, S, M> {
      * @param sourceValueDataField 数据源值字段,赋值给{@code dataValueField}字段
      * @return 数据源对象 {@link Source}
      */
-    Source<D, S, M> value(FieldFunction<D, ?> dataValueField, FieldFunction<S, ?> sourceValueDataField);
+    Source<D, S, M, DF, VF> value(DF dataValueField, VF sourceValueDataField);
 
-    Function<D, ?> getDataKeyField();
+    DF getDataKeyField();
 
-    Function<S, ?> getSourceDataKeyField();
+    VF getSourceDataKeyField();
 
-    Function<D, ?> getDataValueField();
+    DF getDataValueField();
 
-    Function<S, ?> getSourceDataValueField();
+    VF getSourceDataValueField();
 
 }

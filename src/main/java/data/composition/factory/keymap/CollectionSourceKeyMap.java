@@ -11,7 +11,7 @@ import java.util.Collection;
  * @author zhangjinyu
  * @since 2023-07-28
  */
-public class CollectionSourceKeyMap<D, S> implements SourceKeyMap<D, S, Collection<S>> {
+public class CollectionSourceKeyMap<D, S> implements SourceKeyMap<D, S, Collection<S>, FieldFunction<D, ?>, FieldFunction<S, ?>> {
     private final FieldFunction<D, ?> keyDataField;
     private final FieldFunction<S, ?> keySourceDataField;
     private final CollectionSource<D, S> source;
@@ -26,7 +26,7 @@ public class CollectionSourceKeyMap<D, S> implements SourceKeyMap<D, S, Collecti
     }
 
     @Override
-    public Source<D, S, Collection<S>> value(FieldFunction<D, ?> dataValueField, FieldFunction<S, ?> sourceValueDataField) {
+    public Source<D, S, Collection<S>,FieldFunction<D, ?>, FieldFunction<S, ?>> value(FieldFunction<D, ?> dataValueField, FieldFunction<S, ?> sourceValueDataField) {
         this.dataValueField = dataValueField;
         this.sourceValueDataField = sourceValueDataField;
         return source;

@@ -16,10 +16,10 @@ import java.util.List;
 public class DataFactoryTest {
     public static void main(String[] args) {
         allCollectTest();
-        dataCollectTest();
+//        dataCollectSingleSourceTest();
     }
 
-    private static void dataCollectTest() {
+    private static void dataCollectSingleSourceTest() {
         List<Student> students = new ArrayList<>();
         StudentScore studentScore = new StudentScore();
         studentScore.setStudentId(1);

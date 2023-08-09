@@ -8,7 +8,7 @@ import data.composition.factory.source.Source;
  * @author zhangjinyu
  * @since 2023-08-09
  */
-public class SingleSourceKeyMap<D, S> implements SourceKeyMap<D, S, S> {
+public class SingleSourceKeyMap<D, S> implements SourceKeyMap<D, S, S, FieldFunction<D, ?>, FieldFunction<S, ?>> {
     private final FieldFunction<D, ?> keyDataField;
     private final FieldFunction<S, ?> keySourceDataField;
     private final SingleSource<D, S> source;
@@ -23,7 +23,7 @@ public class SingleSourceKeyMap<D, S> implements SourceKeyMap<D, S, S> {
     }
 
     @Override
-    public Source<D, S, S> value(FieldFunction<D, ?> dataValueField, FieldFunction<S, ?> sourceValueDataField) {
+    public Source<D, S, S, FieldFunction<D, ?>, FieldFunction<S, ?>> value(FieldFunction<D, ?> dataValueField, FieldFunction<S, ?> sourceValueDataField) {
         this.dataValueField = dataValueField;
         this.sourceValueDataField = sourceValueDataField;
         return source;
