@@ -8,6 +8,7 @@
     <artifactId>data-composition-factory</artifactId>
     <version>1.0.1</version>
     <packaging>jar</packaging>
+    <name>data-composition-factory</name>
     <url>https://github.com/jlnaisi/data-composition-factory</url>
     <description>数据组装工厂,适用于多数据源数据合并</description>
     <licenses>
