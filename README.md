@@ -73,7 +73,14 @@ public class DataFactoryTest {
 
     private static void allCollectTest(List<Student> students, List<StudentScore> studentScores) {
         long l = System.currentTimeMillis();
-        DataCompositionFactory.data(students).from(CollectionSource.create(studentScores, Student.class).key(Student::getId, StudentScore::getStudentId).value(Student::getName, StudentScore::getName).key(Student::getId, StudentScore::getStudentId).value(Student::getScore, StudentScore::getScore).key(Student::getId, StudentScore::getStudentId).value(Student::getIndex, StudentScore::getIndex)).composition();
+        DataCompositionFactory.data(students)
+                .source(CollectionSource.data(studentScores, Student.class)
+                        .key(Student::getId, StudentScore::getStudentId)
+                        .value(Student::getName, StudentScore::getName)
+                        .value(Student::getScore, StudentScore::getScore)
+                        .value(Student::getIndex, StudentScore::getIndex)
+                        .build()
+                ).composition();
         System.out.println("总体耗时:" + (System.currentTimeMillis() - l));
     }
 }
