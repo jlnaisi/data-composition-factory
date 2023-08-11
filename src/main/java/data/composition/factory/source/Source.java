@@ -3,6 +3,7 @@ package data.composition.factory.source;
 import cn.hutool.core.collection.CollUtil;
 import data.composition.factory.bean.CompositionKey;
 import data.composition.factory.bean.CompositionValue;
+import data.composition.factory.bean.ValueFieldMap;
 import data.composition.factory.keymap.SourceKeyMap;
 import data.composition.factory.util.ReflectUtil;
 
@@ -34,25 +35,28 @@ public interface Source<D, S, M, DF extends Function<D, ?>, VF extends Function<
 
     default Map<CompositionKey, Set<CompositionValue<? extends M>>> createCompositionMap() {
         Map<CompositionKey, Set<CompositionValue<? extends M>>> compositionMap = new HashMap<>();
-        List<SourceKeyMap<D, S, M, DF, VF>> sourceKeyMapList = getSourceKeyMapList().stream().filter(dssSourceKeyMap -> Objects.nonNull(dssSourceKeyMap.getDataKeyField()) && Objects.nonNull(dssSourceKeyMap.getDataValueField()) && Objects.nonNull(dssSourceKeyMap.getSourceDataKeyField()) && Objects.nonNull(dssSourceKeyMap.getSourceDataValueField())).toList();
+        List<SourceKeyMap<D, S, M, DF, VF>> sourceKeyMapList = getSourceKeyMapList().stream().filter(dssSourceKeyMap -> Objects.nonNull(dssSourceKeyMap.getDataKeyField()) && CollUtil.isNotEmpty(dssSourceKeyMap.getValueFieldMaps()) && Objects.nonNull(dssSourceKeyMap.getSourceDataKeyField())).toList();
         if (CollUtil.isNotEmpty(sourceKeyMapList)) {
             for (SourceKeyMap<D, S, M, ? extends Function<D, ?>, ? extends Function<S, ?>> dSourceKeyMap : sourceKeyMapList) {
                 Function<D, ?> dataKeyField = dSourceKeyMap.getDataKeyField();
                 Function<?, ?> sourceDataKeyField = dSourceKeyMap.getSourceDataKeyField();
-                Function<D, ?> dataValueField = dSourceKeyMap.getDataValueField();
-                Function<?, ?> sourceDataValueField = dSourceKeyMap.getSourceDataValueField();
-                String dataKeyFieldName = ReflectUtil.getFieldName(dataKeyField);
-                String sourceDataKeyFieldName = ReflectUtil.getFieldName(sourceDataKeyField);
-                String dataValueFieldName = ReflectUtil.getFieldName(dataValueField);
-                String sourceDataValueFieldName = ReflectUtil.getFieldName(sourceDataValueField);
-                CompositionKey compositionKey = new CompositionKey(dataKeyFieldName, sourceDataKeyFieldName);
-                Set<CompositionValue<? extends M>> compositionValues = compositionMap.get(compositionKey);
-                CompositionValue<M> compositionValue = new CompositionValue<>(dataValueFieldName, sourceDataValueFieldName, createValueGroupBy(sourceDataKeyFieldName));
-                if (Objects.isNull(compositionValues)) {
-                    compositionValues = new HashSet<>();
-                    compositionMap.put(compositionKey, compositionValues);
+                List<? extends ValueFieldMap<D, S, ? extends Function<D, ?>, ? extends Function<S, ?>>> valueFieldMaps = dSourceKeyMap.getValueFieldMaps();
+                for (ValueFieldMap<D, S, ? extends Function<D, ?>, ? extends Function<S, ?>> valueFieldMap : valueFieldMaps) {
+                    Function<D, ?> dataValueField = valueFieldMap.getDataValueField();
+                    Function<?, ?> sourceDataValueField = valueFieldMap.getSourceDataValueField();
+                    String dataKeyFieldName = ReflectUtil.getFieldName(dataKeyField);
+                    String sourceDataKeyFieldName = ReflectUtil.getFieldName(sourceDataKeyField);
+                    String dataValueFieldName = ReflectUtil.getFieldName(dataValueField);
+                    String sourceDataValueFieldName = ReflectUtil.getFieldName(sourceDataValueField);
+                    CompositionKey compositionKey = new CompositionKey(dataKeyFieldName, sourceDataKeyFieldName);
+                    Set<CompositionValue<? extends M>> compositionValues = compositionMap.get(compositionKey);
+                    CompositionValue<M> compositionValue = new CompositionValue<>(dataValueFieldName, sourceDataValueFieldName, createValueGroupBy(sourceDataKeyFieldName));
+                    if (Objects.isNull(compositionValues)) {
+                        compositionValues = new HashSet<>();
+                        compositionMap.put(compositionKey, compositionValues);
+                    }
+                    compositionValues.add(compositionValue);
                 }
-                compositionValues.add(compositionValue);
             }
         }
         return compositionMap;

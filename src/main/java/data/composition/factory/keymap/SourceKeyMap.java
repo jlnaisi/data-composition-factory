@@ -1,8 +1,9 @@
 package data.composition.factory.keymap;
 
-import data.composition.factory.function.FieldFunction;
+import data.composition.factory.bean.ValueFieldMap;
 import data.composition.factory.source.Source;
 
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -17,14 +18,13 @@ public interface SourceKeyMap<D, S, M, DF extends Function<D, ?>, VF extends Fun
      * @param sourceValueDataField 数据源值字段,赋值给{@code dataValueField}字段
      * @return 数据源对象 {@link Source}
      */
-    Source<D, S, M, DF, VF> value(DF dataValueField, VF sourceValueDataField);
+    SourceKeyMap<D, S, M, DF, VF> value(DF dataValueField, VF sourceValueDataField);
 
     DF getDataKeyField();
 
     VF getSourceDataKeyField();
 
-    DF getDataValueField();
+    List<ValueFieldMap<D, S, DF, VF>> getValueFieldMaps();
 
-    VF getSourceDataValueField();
-
+    Source<D, S, M, DF, VF> build();
 }

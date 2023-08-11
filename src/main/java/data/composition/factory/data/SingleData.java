@@ -20,7 +20,7 @@ public class SingleData<D> implements Data<D, D> {
     }
 
     @Override
-    public <S, M, DF extends Function<D, ?>, VF extends Function<S, ?>> Data<D, D> from(Source<D, S, M, DF, VF> source) {
+    public <S, M, DF extends Function<D, ?>, VF extends Function<S, ?>> Data<D, D> source(Source<D, S, M, DF, VF> source) {
         return null;
     }
 

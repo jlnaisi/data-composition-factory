@@ -12,7 +12,7 @@ import java.util.function.Function;
  * @since 2023-07-25
  */
 public interface Data<D, C> {
-    <S, M, DF extends Function<D, ?>, VF extends Function<S, ?>> Data<D, C> from(Source<D, S, M, DF, VF> source);
+    <S, M, DF extends Function<D, ?>, VF extends Function<S, ?>> Data<D, C> source(Source<D, S, M, DF, VF> source);
 
     void composition();
 }
