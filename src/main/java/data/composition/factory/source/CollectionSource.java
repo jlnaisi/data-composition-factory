@@ -38,7 +38,7 @@ public class CollectionSource<D, S> implements Source<D, S, Collection<S>, Field
      * @return 数据源对象 {@link Source}
      */
     @SuppressWarnings("unused")
-    public static <D, S> Source<D, S, Collection<S>, FieldFunction<D, ?>, FieldFunction<S, ?>> create(Collection<S> source, Class<D> clazz) {
+    public static <D, S> Source<D, S, Collection<S>, FieldFunction<D, ?>, FieldFunction<S, ?>> data(Collection<S> source, Class<D> clazz) {
         return new CollectionSource<>(source);
     }
 

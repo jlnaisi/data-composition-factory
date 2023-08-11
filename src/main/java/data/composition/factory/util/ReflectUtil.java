@@ -182,14 +182,22 @@ public class ReflectUtil {
             return null;
         }
         if (Collection.class.isAssignableFrom(sourceValuefield.getType())) {
-            if (sourceValuefield.getType().isAssignableFrom(obj.getClass())) {
+            if (Collection.class.isAssignableFrom(obj.getClass())) {
                 List<Object> list = (List<Object>) obj;
                 return list.stream().flatMap(o -> {
                     Object fieldValue = ReflectUtil.getFieldValue(sourceValuefield, o);
                     return fieldValue == null ? Stream.empty() : ((List<Object>) fieldValue).stream();
                 }).collect(Collectors.toList());
             } else {
-                return Collections.singletonList(getFieldValue(sourceValuefield, obj));
+                Object fieldValue = getFieldValue(sourceValuefield, obj);
+                if (Objects.isNull(fieldValue)) {
+                    return Collections.emptyList();
+                }
+                if (Collection.class.isAssignableFrom(fieldValue.getClass())) {
+                    return (List<?>) fieldValue;
+                } else {
+                    return Collections.singletonList(fieldValue);
+                }
             }
         } else {
             if (obj instanceof Collection<?> objList) {

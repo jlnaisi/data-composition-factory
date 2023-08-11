@@ -1,8 +1,12 @@
 package data.composition.factory.keymap;
 
+import data.composition.factory.bean.ValueFieldMap;
 import data.composition.factory.function.FieldFunction;
 import data.composition.factory.source.SingleSource;
 import data.composition.factory.source.Source;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author zhangjinyu
@@ -12,21 +16,20 @@ public class SingleSourceKeyMap<D, S> implements SourceKeyMap<D, S, S, FieldFunc
     private final FieldFunction<D, ?> keyDataField;
     private final FieldFunction<S, ?> keySourceDataField;
     private final SingleSource<D, S> source;
-    private FieldFunction<D, ?> dataValueField;
-    private FieldFunction<S, ?> sourceValueDataField;
+    private final List<ValueFieldMap<D, S, FieldFunction<D, ?>, FieldFunction<S, ?>>> valueFieldMaps;
 
     public SingleSourceKeyMap(SingleSource<D, S> source, FieldFunction<D, ?> keyDataField, FieldFunction<S, ?> keySourceDataField) {
         this.source = source;
         this.keyDataField = keyDataField;
         this.keySourceDataField = keySourceDataField;
+        this.valueFieldMaps = new ArrayList<>();
         source.getSourceKeyMapList().add(this);
     }
 
     @Override
-    public Source<D, S, S, FieldFunction<D, ?>, FieldFunction<S, ?>> value(FieldFunction<D, ?> dataValueField, FieldFunction<S, ?> sourceValueDataField) {
-        this.dataValueField = dataValueField;
-        this.sourceValueDataField = sourceValueDataField;
-        return source;
+    public SourceKeyMap<D, S, S, FieldFunction<D, ?>, FieldFunction<S, ?>> value(FieldFunction<D, ?> dataValueField, FieldFunction<S, ?> sourceValueDataField) {
+        this.valueFieldMaps.add(new ValueFieldMap<>(dataValueField, sourceValueDataField));
+        return this;
     }
 
     @Override
@@ -40,13 +43,14 @@ public class SingleSourceKeyMap<D, S> implements SourceKeyMap<D, S, S, FieldFunc
     }
 
     @Override
-    public FieldFunction<D, ?> getDataValueField() {
-        return dataValueField;
+    public List<ValueFieldMap<D, S, FieldFunction<D, ?>, FieldFunction<S, ?>>> getValueFieldMaps() {
+        return valueFieldMaps;
     }
 
     @Override
-    public FieldFunction<S, ?> getSourceDataValueField() {
-        return sourceValueDataField;
+    public Source<D, S, S, FieldFunction<D, ?>, FieldFunction<S, ?>> build() {
+        return source;
     }
+
 
 }

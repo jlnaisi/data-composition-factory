@@ -36,7 +36,7 @@ public class CollectionData<D> implements Data<D, Collection<D>> {
      * @return 集合数据对象 {@link CollectionData}
      */
     @Override
-    public <S, M, DF extends Function<D, ?>, VF extends Function<S, ?>> Data<D, Collection<D>> from(Source<D, S, M, DF, VF> source) {
+    public <S, M, DF extends Function<D, ?>, VF extends Function<S, ?>> Data<D, Collection<D>> source(Source<D, S, M, DF, VF> source) {
         if (Objects.nonNull(source) && source.enabled()) {
             this.sourceList.add(source);
         }

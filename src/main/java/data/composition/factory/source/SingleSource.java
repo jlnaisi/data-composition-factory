@@ -31,13 +31,13 @@ public class SingleSource<D, S> implements Source<D, S, S, FieldFunction<D, ?>, 
      * 创建数据源对象
      *
      * @param source 数据源数据
-     * @param clazz  数据类,用来泛型传递,使{@link #key(FieldFunction, FieldFunction)}和{@link SourceKeyMap#value(FieldFunction, FieldFunction)}的入参泛型能够正确识别
+     * @param clazz  数据类,用来泛型传递,使{@link #key(FieldFunction, FieldFunction)}和{@link SourceKeyMap#value(Function, Function)}的入参泛型能够正确识别
      * @param <D>    数据泛型
      * @param <S>    数据源泛型
      * @return 数据源对象 {@link Source}
      */
     @SuppressWarnings("unused")
-    public static <D, S> Source<D, S, S, FieldFunction<D, ?>, FieldFunction<S, ?>> create(S source, Class<D> clazz) {
+    public static <D, S> Source<D, S, S, FieldFunction<D, ?>, FieldFunction<S, ?>> data(S source, Class<D> clazz) {
         return new SingleSource<>(source);
     }
 
