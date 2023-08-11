@@ -11,6 +11,26 @@
 |     集合     |  √  |  √   |
 |    单个对象    | 实现中 | 实现中  | 
 
+### 安装
+
+- Maven依赖
+  ```maven
+    <dependency>
+      <groupId>cn.jlnaisi</groupId>
+      <artifactId>data-composition-factory</artifactId>
+      <version>1.0.1-SNAPSHOT</version>
+    </dependency>
+    ```
+  考虑到非强制依赖性，因此hutool需要用户自行引入：
+  ```maven
+  <dependency>
+    <groupId>cn.hutool</groupId>
+    <artifactId>hutool-core</artifactId>
+    <version>请参考本项目pom里的具体依赖</version>
+  </dependency>
+  ```
+  > 说明 本项目pom内的hutool依赖scope级别为provided
+
 ### 前言
 
 > 在进行微服务开发的过程中，有如下场景：`A微服务需要从B、C、D等微服务中获取数据，然后在A服务中进行数据拼装返回给调用方`</br>
