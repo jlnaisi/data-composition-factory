@@ -20,15 +20,6 @@
 ### 安装
 
 - Maven依赖
-  - 快照版本
-    ```maven
-      <dependency>
-        <groupId>cn.jlnaisi</groupId>
-        <artifactId>data-composition-factory</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
-      </dependency>
-      ```
-  - 正式版本
     ```maven
       <dependency>
         <groupId>cn.jlnaisi</groupId>
