@@ -20,12 +20,21 @@
 ### 安装
 
 - Maven依赖
-  ```maven
-    <dependency>
-      <groupId>cn.jlnaisi</groupId>
-      <artifactId>data-composition-factory</artifactId>
-      <version>1.0.1-SNAPSHOT</version>
-    </dependency>
+  - 快照版本
+    ```maven
+      <dependency>
+        <groupId>cn.jlnaisi</groupId>
+        <artifactId>data-composition-factory</artifactId>
+        <version>1.0.1-SNAPSHOT</version>
+      </dependency>
+      ```
+  - 正式版本
+    ```maven
+      <dependency>
+        <groupId>cn.jlnaisi</groupId>
+        <artifactId>data-composition-factory</artifactId>
+        <version>1.0.1</version>
+      </dependency>
     ```
   考虑到非强制依赖性，因此hutool需要用户自行引入：
   ```maven
