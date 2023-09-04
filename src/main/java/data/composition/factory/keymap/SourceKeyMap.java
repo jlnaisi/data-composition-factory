@@ -21,9 +21,6 @@ public interface SourceKeyMap<D, S, M, DF extends Function<D, ?>, VF extends Fun
      * @return 数据源对象 {@link Source}
      */
     SourceKeyMap<D, S, M, DF, VF> value(DF dataValueField, VF sourceValueDataField);
-    SourceKeyMap<D, S, M, DF, VF> filter(Predicate<? super D> predicate);
-
-    Predicate<? super D> getFilterPredicate();
 
     DF getDataKeyField();
 

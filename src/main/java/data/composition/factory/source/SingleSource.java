@@ -18,11 +18,12 @@ import java.util.stream.Collectors;
  * @since 2023-08-09
  */
 public class SingleSource<D, S> implements Source<D, S, S, FieldFunction<D, ?>, FieldFunction<S, ?>> {
-    final S source;
     private final List<SourceKeyMap<D, S, S, FieldFunction<D, ?>, FieldFunction<S, ?>>> sourceKeyMapList;
+    S source;
     private Map<String, Field> sourceFieldMap;
     private Map<CompositionKey, Set<CompositionValue<? extends S>>> compositionMap;
-    private Predicate<S> predicate;
+    private List<Predicate<S>> predicates;
+    private boolean predicateDone;
 
     private SingleSource(S source) {
         this.source = source;
@@ -61,28 +62,47 @@ public class SingleSource<D, S> implements Source<D, S, S, FieldFunction<D, ?>, 
 
     @Override
     public Source<D, S, S, FieldFunction<D, ?>, FieldFunction<S, ?>> filter(Predicate<S> predicate) {
-        this.predicate = predicate;
+        if (Objects.isNull(predicates)) {
+            predicates = new ArrayList<>();
+        }
+        if (Objects.nonNull(predicate)) {
+            this.predicates.add(predicate);
+        }
         return this;
     }
 
     @Override
-    public S getSourceData() {
-        return source;
+    public Optional<S> getSourceData() {
+        if (Objects.nonNull(predicates) && !predicateDone) {
+            predicateDone = true;
+            for (Predicate<S> predicate : predicates) {
+                if (!predicate.test(source)) {
+                    source = null;
+                    break;
+                }
+            }
+        }
+        return Optional.ofNullable(source);
     }
 
     @Override
     public Map<String, Field> getSourceFieldMap() {
         if (Objects.isNull(sourceFieldMap)) {
-            sourceFieldMap = ReflectUtil.getStreamCacheFields(getSourceData().getClass(), true, field -> field.setAccessible(true)).collect(Collectors.toMap(Field::getName, v -> v));
+            Optional<S> sourceData = getSourceData();
+            sourceFieldMap = sourceData.map(s -> ReflectUtil.getStreamCacheFields(s.getClass(), true, field -> field.setAccessible(true)).collect(Collectors.toMap(Field::getName, v -> v))).orElse(Collections.emptyMap());
         }
         return sourceFieldMap;
     }
 
     @Override
     public Map<Object, S> createValueGroupBy(String sourceDataKeyFieldName) {
-        Map<Object, S> valueGroupBy = new HashMap<>(2, 1);
-        valueGroupBy.put(ReflectUtil.getFieldValue(getSourceFieldMap().get(sourceDataKeyFieldName), getSourceData()), getSourceData());
-        return valueGroupBy;
+        if (getSourceData().isPresent()) {
+            Map<Object, S> valueGroupBy = new HashMap<>(2, 1);
+            valueGroupBy.put(ReflectUtil.getFieldValue(getSourceFieldMap().get(sourceDataKeyFieldName), getSourceData().get()), getSourceData().get());
+            return valueGroupBy;
+        } else {
+            return Collections.emptyMap();
+        }
     }
 
     @Override

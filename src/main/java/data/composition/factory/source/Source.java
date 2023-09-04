@@ -32,7 +32,7 @@ public interface Source<D, S, M, DF extends Function<D, ?>, VF extends Function<
 
     Source<D, S, M, DF, VF> filter(Predicate<S> predicate);
 
-    M getSourceData();
+    Optional<M> getSourceData();
 
     Map<String, Field> getSourceFieldMap();
 

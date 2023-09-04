@@ -13,17 +13,18 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author zhangjinyu
  * @since 2023-07-25
  */
 public class CollectionSource<D, S> implements Source<D, S, Collection<S>, FieldFunction<D, ?>, FieldFunction<S, ?>> {
-    Collection<S> source;
     private final List<SourceKeyMap<D, S, Collection<S>, FieldFunction<D, ?>, FieldFunction<S, ?>>> sourceKeyMapList;
+    Collection<S> source;
     private Map<String, Field> sourceFieldMap;
     private Map<CompositionKey, Set<CompositionValue<? extends Collection<S>>>> compositionMap;
-    private Predicate<S> predicate;
+    private List<Predicate<S>> predicates;
     private boolean predicateDone;
 
     private CollectionSource(Collection<S> source) {
@@ -35,7 +36,7 @@ public class CollectionSource<D, S> implements Source<D, S, Collection<S>, Field
      * 创建数据源对象
      *
      * @param source 数据源数据
-     * @param clazz  数据类,用来泛型传递,使{@link #key(Function, Function)}和{@link SourceKeyMap#value(Function, Function)}的入参泛型能够正确识别
+     * @param clazz  数据类,用来泛型传递,使{@link #key(FieldFunction, FieldFunction)}和{@link SourceKeyMap#value(Function, Function)}的入参泛型能够正确识别
      * @param <D>    数据泛型
      * @param <S>    数据源泛型
      * @return 数据源对象 {@link Source}
@@ -62,31 +63,49 @@ public class CollectionSource<D, S> implements Source<D, S, Collection<S>, Field
 
     @Override
     public Source<D, S, Collection<S>, FieldFunction<D, ?>, FieldFunction<S, ?>> filter(Predicate<S> predicate) {
-        this.predicate = predicate;
+        if (Objects.isNull(predicates)) {
+            predicates = new ArrayList<>();
+        }
+        if (Objects.nonNull(predicate)) {
+            this.predicates.add(predicate);
+        }
         return this;
     }
 
     @Override
-    public Collection<S> getSourceData() {
-        if (Objects.nonNull(predicate) && !predicateDone) {
+    public Optional<Collection<S>> getSourceData() {
+        if (Objects.nonNull(predicates) && !predicateDone) {
             predicateDone = true;
-            source = source.stream().filter(predicate).toList();
+            Stream<S> stream = source.stream();
+            for (Predicate<S> predicate : predicates) {
+                stream = stream.filter(predicate);
+            }
+            source = stream.toList();
         }
-        return source;
+        if (source.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(source);
     }
 
     @Override
     public Map<String, Field> getSourceFieldMap() {
         if (Objects.isNull(sourceFieldMap)) {
-            sourceFieldMap = ReflectUtil.getStreamCacheFields(CollUtil.getFirst(getSourceData()).getClass(), true, field -> field.setAccessible(true)).collect(Collectors.toMap(Field::getName, v -> v));
+            Optional<Collection<S>> sourceData = getSourceData();
+            sourceFieldMap = sourceData.map(s -> ReflectUtil.getStreamCacheFields(CollUtil.getFirst(s).getClass(), true, field -> field.setAccessible(true)).collect(Collectors.toMap(Field::getName, v -> v))).orElse(Collections.emptyMap());
         }
         return sourceFieldMap;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Map<Object, Collection<S>> createValueGroupBy(String sourceDataKeyFieldName) {
-        Map<Object, ? extends Collection<S>> collect = getSourceData().stream().filter(s -> Objects.nonNull(ReflectUtil.getFieldValue(getSourceFieldMap().get(sourceDataKeyFieldName), s))).collect(Collectors.groupingBy(s -> ReflectUtil.getFieldValueSafe(sourceFieldMap.get(sourceDataKeyFieldName), s, null)));
-        return (Map<Object, Collection<S>>) collect;
+        if (getSourceData().isPresent()) {
+            Map<Object, ? extends Collection<S>> collect = getSourceData().get().stream().filter(s -> Objects.nonNull(ReflectUtil.getFieldValue(getSourceFieldMap().get(sourceDataKeyFieldName), s))).collect(Collectors.groupingBy(s -> ReflectUtil.getFieldValueSafe(sourceFieldMap.get(sourceDataKeyFieldName), s, null)));
+            return (Map<Object, Collection<S>>) collect;
+        } else {
+            return Collections.emptyMap();
+        }
     }
 
     @Override
