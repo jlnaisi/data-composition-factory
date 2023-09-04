@@ -10,6 +10,7 @@ import data.composition.factory.util.ReflectUtil;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -21,6 +22,7 @@ public class SingleSource<D, S> implements Source<D, S, S, FieldFunction<D, ?>, 
     private final List<SourceKeyMap<D, S, S, FieldFunction<D, ?>, FieldFunction<S, ?>>> sourceKeyMapList;
     private Map<String, Field> sourceFieldMap;
     private Map<CompositionKey, Set<CompositionValue<? extends S>>> compositionMap;
+    private Predicate<S> predicate;
 
     private SingleSource(S source) {
         this.source = source;
@@ -55,6 +57,12 @@ public class SingleSource<D, S> implements Source<D, S, S, FieldFunction<D, ?>, 
     @Override
     public List<SourceKeyMap<D, S, S, FieldFunction<D, ?>, FieldFunction<S, ?>>> getSourceKeyMapList() {
         return sourceKeyMapList;
+    }
+
+    @Override
+    public Source<D, S, S, FieldFunction<D, ?>, FieldFunction<S, ?>> filter(Predicate<S> predicate) {
+        this.predicate = predicate;
+        return this;
     }
 
     @Override

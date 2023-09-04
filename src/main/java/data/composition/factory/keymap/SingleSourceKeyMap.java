@@ -7,6 +7,7 @@ import data.composition.factory.source.Source;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * @author zhangjinyu
@@ -17,6 +18,7 @@ public class SingleSourceKeyMap<D, S> implements SourceKeyMap<D, S, S, FieldFunc
     private final FieldFunction<S, ?> keySourceDataField;
     private final SingleSource<D, S> source;
     private final List<ValueFieldMap<D, S, FieldFunction<D, ?>, FieldFunction<S, ?>>> valueFieldMaps;
+    private Predicate<? super D> predicate;
 
     public SingleSourceKeyMap(SingleSource<D, S> source, FieldFunction<D, ?> keyDataField, FieldFunction<S, ?> keySourceDataField) {
         this.source = source;
@@ -30,6 +32,17 @@ public class SingleSourceKeyMap<D, S> implements SourceKeyMap<D, S, S, FieldFunc
     public SourceKeyMap<D, S, S, FieldFunction<D, ?>, FieldFunction<S, ?>> value(FieldFunction<D, ?> dataValueField, FieldFunction<S, ?> sourceValueDataField) {
         this.valueFieldMaps.add(new ValueFieldMap<>(dataValueField, sourceValueDataField));
         return this;
+    }
+
+    @Override
+    public SourceKeyMap<D, S, S, FieldFunction<D, ?>, FieldFunction<S, ?>> filter(Predicate<? super D> predicate) {
+        this.predicate = predicate;
+        return this;
+    }
+
+    @Override
+    public Predicate<? super D> getFilterPredicate() {
+        return predicate;
     }
 
     @Override

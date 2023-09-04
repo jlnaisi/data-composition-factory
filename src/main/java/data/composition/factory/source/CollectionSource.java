@@ -11,6 +11,7 @@ import data.composition.factory.util.ReflectUtil;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -18,10 +19,12 @@ import java.util.stream.Collectors;
  * @since 2023-07-25
  */
 public class CollectionSource<D, S> implements Source<D, S, Collection<S>, FieldFunction<D, ?>, FieldFunction<S, ?>> {
-    final Collection<S> source;
+    Collection<S> source;
     private final List<SourceKeyMap<D, S, Collection<S>, FieldFunction<D, ?>, FieldFunction<S, ?>>> sourceKeyMapList;
     private Map<String, Field> sourceFieldMap;
     private Map<CompositionKey, Set<CompositionValue<? extends Collection<S>>>> compositionMap;
+    private Predicate<S> predicate;
+    private boolean predicateDone;
 
     private CollectionSource(Collection<S> source) {
         this.source = source;
@@ -58,7 +61,17 @@ public class CollectionSource<D, S> implements Source<D, S, Collection<S>, Field
     }
 
     @Override
+    public Source<D, S, Collection<S>, FieldFunction<D, ?>, FieldFunction<S, ?>> filter(Predicate<S> predicate) {
+        this.predicate = predicate;
+        return this;
+    }
+
+    @Override
     public Collection<S> getSourceData() {
+        if (Objects.nonNull(predicate) && !predicateDone) {
+            predicateDone = true;
+            source = source.stream().filter(predicate).toList();
+        }
         return source;
     }
 

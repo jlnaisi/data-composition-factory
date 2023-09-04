@@ -10,6 +10,7 @@ import data.composition.factory.util.ReflectUtil;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * @author zhangjinyu
@@ -28,6 +29,8 @@ public interface Source<D, S, M, DF extends Function<D, ?>, VF extends Function<
     SourceKeyMap<D, S, M, DF, VF> key(DF dataField, VF sourceField);
 
     List<SourceKeyMap<D, S, M, DF, VF>> getSourceKeyMapList();
+
+    Source<D, S, M, DF, VF> filter(Predicate<S> predicate);
 
     M getSourceData();
 

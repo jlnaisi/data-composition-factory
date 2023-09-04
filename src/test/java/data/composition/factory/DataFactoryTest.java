@@ -41,8 +41,8 @@ public class DataFactoryTest {
             studentScores.add(studentScore);
         }
         DataCompositionFactory.data(students)
-                .filter(student -> student.getId() == 3)
                 .source(CollectionSource.data(studentScores, Student.class)
+                        .filter(studentScore -> studentScore.getStudentId() == 1)
                         .key(Student::getId, StudentScore::getStudentId)
                         .value(Student::getName, StudentScore::getName)
                         .value(Student::getScore, StudentScore::getScore)
