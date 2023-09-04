@@ -5,6 +5,7 @@ import data.composition.factory.source.Source;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * @author zhangjinyu
@@ -17,6 +18,16 @@ public class SingleData<D> implements Data<D, D> {
     public SingleData(D data) {
         this.data = data;
         this.sourceList = new ArrayList<>();
+    }
+
+    public SingleData(List<Source<D, ?, ?, ?, ?>> sourceList, D data) {
+        this.sourceList = sourceList;
+        this.data = data;
+    }
+
+    @Override
+    public Data<D, D> filter(Predicate<? super D> predicate) {
+        return null;
     }
 
     @Override

@@ -10,7 +10,9 @@ import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 集合数据,处理数据拼装的类
@@ -21,10 +23,17 @@ import java.util.stream.Collectors;
 public class CollectionData<D> implements Data<D, Collection<D>> {
     private final List<Source<D, ?, ?, ?, ?>> sourceList;
     private final Collection<D> data;
+    private Predicate<? super D> predicate;
 
     public CollectionData(Collection<D> data) {
         this.data = data;
         this.sourceList = new ArrayList<>();
+    }
+
+    @Override
+    public Data<D, Collection<D>> filter(Predicate<? super D> predicate) {
+        this.predicate = predicate;
+        return this;
     }
 
     /**
@@ -43,6 +52,7 @@ public class CollectionData<D> implements Data<D, Collection<D>> {
         return this;
     }
 
+
     /**
      * 开始组装
      */
@@ -56,7 +66,11 @@ public class CollectionData<D> implements Data<D, Collection<D>> {
             return;
         }
         Map<String, Field> dataFiledNameMap = ReflectUtil.getStreamCacheFields(CollUtil.getFirst(data).getClass(), true, field -> field.setAccessible(true)).collect(Collectors.toMap(Field::getName, v -> v));
-        for (D datum : data) {
+        Stream<D> stream = data.stream();
+        if (Objects.nonNull(predicate)) {
+            stream = stream.filter(predicate);
+        }
+        stream.forEach(datum -> {
             for (Source<D, ?, ?, ?, ?> source : sourceList) {
                 Map<CompositionKey, Set<CompositionValue<?>>> compositionMap = (Map<CompositionKey, Set<CompositionValue<?>>>) source.getCompositionMap();
                 compositionMap.forEach((BiConsumer<? super CompositionKey, ? super Set<? extends CompositionValue<?>>>) (compositionKey, compositionValues) -> {
@@ -74,6 +88,6 @@ public class CollectionData<D> implements Data<D, Collection<D>> {
                     }
                 });
             }
-        }
+        });
     }
 }
