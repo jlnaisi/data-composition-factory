@@ -6,7 +6,7 @@
 
     <groupId>cn.jlnaisi</groupId>
     <artifactId>data-composition-factory</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
     <name>data-composition-factory</name>
     <url>https://github.com/jlnaisi/data-composition-factory</url>
