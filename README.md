@@ -28,6 +28,7 @@
 - 2023-09-07
   > 版本: 1.1.1<br>
   > 新增 source 增加merge distinct逻辑(修复原逻辑)
+  > 移除pom依赖:hutool和gson 
 
 ### 安装
 
