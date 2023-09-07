@@ -1,12 +1,10 @@
 package data.composition.factory.keymap;
 
 import data.composition.factory.bean.ValueFieldMap;
-import data.composition.factory.data.Data;
 import data.composition.factory.source.Source;
 
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 /**
  * @author zhangjinyu

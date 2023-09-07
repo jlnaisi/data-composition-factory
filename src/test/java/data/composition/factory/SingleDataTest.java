@@ -1,7 +1,5 @@
 package data.composition.factory;
 
-import cn.hutool.core.util.RandomUtil;
-import com.google.gson.Gson;
 import data.composition.factory.source.CollectionSource;
 import data.composition.factory.source.SingleSource;
 
@@ -43,7 +41,7 @@ public class SingleDataTest {
                         .value(Student::getScore, StudentScore::getScore)
                         .build())
                 .composition();
-        System.out.println(new Gson().toJson(student));
+        System.out.println(student);
     }
 
     private static void collectSourceTest() {
@@ -53,9 +51,9 @@ public class SingleDataTest {
         for (int i = 1; i <= 100000; i++) {
             StudentScore studentScore = new StudentScore();
             studentScore.setStudentId(i);
-            studentScore.setName(new String(new char[]{RandomUtil.randomChinese(), RandomUtil.randomChinese(), RandomUtil.randomChinese()}));
+            studentScore.setName(new String("张三" + i));
             studentScore.setIndex(i == 2 ? null : Arrays.asList(i, i + 1));
-            studentScore.setScore(RandomUtil.randomNumbers(3));
+            studentScore.setScore(String.valueOf(i + 10));
             studentScores.add(studentScore);
         }
         collectSourceTest(student, studentScores);

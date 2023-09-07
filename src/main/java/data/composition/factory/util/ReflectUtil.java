@@ -1,10 +1,5 @@
 package data.composition.factory.util;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.SimpleCache;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.StrUtil;
-
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -28,22 +23,6 @@ public class ReflectUtil {
     private static final String GET = "get";
     private static final String IS = "is";
 
-    public static Optional<Field> getField(Class<?> beanClass, String fieldName) {
-        Field[] fields = getCacheFields(beanClass);
-        if (Objects.isNull(fields)) {
-            return Optional.empty();
-        }
-        for (Field field : fields) {
-            if (field.getName().equals(fieldName)) {
-                return Optional.of(field);
-            }
-        }
-        return Optional.empty();
-    }
-
-    public static Stream<Field> getStreamCacheFields(Class<?> beanClass) {
-        return getStreamCacheFields(beanClass, false, null);
-    }
 
     public static Stream<Field> getStreamCacheFields(Class<?> beanClass, boolean oncePeek, Consumer<Field> action) {
         Field[] fields = FIELDS_CACHE.get(beanClass);
@@ -145,9 +124,8 @@ public class ReflectUtil {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public static void setFieldValue(Field field, Object data, Object value) {
-        if (Objects.isNull(data) || Objects.isNull(value)) {
+        if (Objects.isNull(data)) {
             return;
         }
         try {
@@ -156,16 +134,15 @@ public class ReflectUtil {
             } else {
                 Class<?> type = field.getType();
                 if (Collection.class.isAssignableFrom(type)) {
-                    if (value instanceof Collection<?> values) {
-                        field.set(data, CollUtil.addAll((Collection<?>) field.get(data), values));
+                    if (value instanceof Collection<?>) {
+                        field.set(data, value);
                     } else {
-                        Collection<Object> objects = (Collection<Object>) field.get(data);
-                        objects.add(value);
-                        field.set(data, objects);
+                        field.set(data, Collections.singletonList(value));
                     }
                 } else {
-                    if (value instanceof Collection<?> values) {
-                        field.set(data, CollUtil.getFirst(values));
+                    if (value instanceof Collection<?>) {
+                        Collection<?> values = (Collection<?>) value;
+                        field.set(data, CollectUtil.getLast(values));
                     } else {
                         field.set(data, value);
                     }
@@ -176,34 +153,38 @@ public class ReflectUtil {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public static List<?> unfold(Field sourceValuefield, Object obj) {
+    public static Object unfold(Field sourceValuefield, Object obj, boolean merge, boolean distinct) {
         if (Objects.isNull(obj)) {
             return null;
         }
         if (Collection.class.isAssignableFrom(sourceValuefield.getType())) {
             if (Collection.class.isAssignableFrom(obj.getClass())) {
-                List<Object> list = (List<Object>) obj;
-                return list.stream().flatMap(o -> {
+                List<?> list = (List<?>) obj;
+                if (merge || distinct) {
+                    Stream<Object> objectStream = list.stream().flatMap(o -> {
                     Object fieldValue = ReflectUtil.getFieldValue(sourceValuefield, o);
-                    return fieldValue == null ? Stream.empty() : ((List<Object>) fieldValue).stream();
-                }).collect(Collectors.toList());
+                        return fieldValue == null ? Stream.empty() : ((List<?>) fieldValue).stream();
+                    });
+                    if (distinct) {
+                        objectStream = objectStream.distinct();
+                    }
+                    return objectStream.collect(Collectors.toList());
+                }
+                return getFieldValue(sourceValuefield, CollectUtil.getLast(list));
             } else {
-                Object fieldValue = getFieldValue(sourceValuefield, obj);
-                if (Objects.isNull(fieldValue)) {
-                    return Collections.emptyList();
-                }
-                if (Collection.class.isAssignableFrom(fieldValue.getClass())) {
-                    return (List<?>) fieldValue;
-                } else {
-                    return Collections.singletonList(fieldValue);
-                }
+                return getFieldValue(sourceValuefield, obj);
             }
         } else {
-            if (obj instanceof Collection<?> objList) {
-                return objList.stream().map((Function<Object, Object>) o -> getFieldValue(sourceValuefield, o)).toList();
+            if (obj instanceof Collection<?>) {
+                Collection<?> objList = (Collection<?>) obj;
+                if (merge) {
+                    Stream<?> stream = objList.stream();
+                    return stream.map((Function<Object, Object>) o -> getFieldValue(sourceValuefield, o)).collect(Collectors.toList());
+                } else {
+                    return getFieldValue(sourceValuefield, CollectUtil.getLast(objList));
+                }
             }
-            return Collections.singletonList(getFieldValue(sourceValuefield, obj));
+            return getFieldValue(sourceValuefield, obj);
         }
     }
 }

@@ -14,7 +14,6 @@ import java.util.function.Predicate;
  */
 public interface Data<D, C> {
     Data<D, C> filter(Predicate<? super D> predicate);
-
     <S, M, DF extends Function<D, ?>, VF extends Function<S, ?>> Data<D, C> source(Source<D, S, M, DF, VF> source);
 
     void composition();

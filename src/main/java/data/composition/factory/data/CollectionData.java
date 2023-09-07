@@ -1,6 +1,5 @@
 package data.composition.factory.data;
 
-import cn.hutool.core.collection.CollUtil;
 import data.composition.factory.source.Source;
 import data.composition.factory.util.ReflectUtil;
 
@@ -49,10 +48,10 @@ public class CollectionData<D> extends AbstractData<D, Collection<D>> {
      */
     @Override
     public void composition() {
-        if (Objects.isNull(data) || CollUtil.isEmpty(sourceList)) {
+        if (Objects.isNull(data) || sourceList.isEmpty()) {
             return;
         }
-        Map<String, Field> dataFiledNameMap = ReflectUtil.getStreamCacheFields(CollUtil.getFirst(data).getClass(), true, field -> field.setAccessible(true)).collect(Collectors.toMap(Field::getName, v -> v));
+        Map<String, Field> dataFiledNameMap = ReflectUtil.getStreamCacheFields(data.iterator().next().getClass(), true, field -> field.setAccessible(true)).collect(Collectors.toMap(Field::getName, v -> v));
         if (Objects.isNull(getPredicates())) {
             for (D datum : data) {
                 execute(dataFiledNameMap, datum);

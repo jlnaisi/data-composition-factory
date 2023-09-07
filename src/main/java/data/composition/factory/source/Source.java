@@ -1,6 +1,5 @@
 package data.composition.factory.source;
 
-import cn.hutool.core.collection.CollUtil;
 import data.composition.factory.bean.CompositionKey;
 import data.composition.factory.bean.CompositionValue;
 import data.composition.factory.bean.ValueFieldMap;
@@ -11,6 +10,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * @author zhangjinyu
@@ -38,8 +38,8 @@ public interface Source<D, S, M, DF extends Function<D, ?>, VF extends Function<
 
     default Map<CompositionKey, Set<CompositionValue<? extends M>>> createCompositionMap() {
         Map<CompositionKey, Set<CompositionValue<? extends M>>> compositionMap = new HashMap<>();
-        List<SourceKeyMap<D, S, M, DF, VF>> sourceKeyMapList = getSourceKeyMapList().stream().filter(dssSourceKeyMap -> Objects.nonNull(dssSourceKeyMap.getDataKeyField()) && CollUtil.isNotEmpty(dssSourceKeyMap.getValueFieldMaps()) && Objects.nonNull(dssSourceKeyMap.getSourceDataKeyField())).toList();
-        if (CollUtil.isNotEmpty(sourceKeyMapList)) {
+        List<SourceKeyMap<D, S, M, DF, VF>> sourceKeyMapList = getSourceKeyMapList().stream().filter(dssSourceKeyMap -> Objects.nonNull(dssSourceKeyMap.getDataKeyField()) && Objects.nonNull(dssSourceKeyMap.getValueFieldMaps()) && !dssSourceKeyMap.getValueFieldMaps().isEmpty() && Objects.nonNull(dssSourceKeyMap.getSourceDataKeyField())).collect(Collectors.toList());
+        if (!sourceKeyMapList.isEmpty()) {
             for (SourceKeyMap<D, S, M, ? extends Function<D, ?>, ? extends Function<S, ?>> dSourceKeyMap : sourceKeyMapList) {
                 Function<D, ?> dataKeyField = dSourceKeyMap.getDataKeyField();
                 Function<?, ?> sourceDataKeyField = dSourceKeyMap.getSourceDataKeyField();
@@ -68,4 +68,16 @@ public interface Source<D, S, M, DF extends Function<D, ?>, VF extends Function<
     Map<Object, M> createValueGroupBy(String sourceDataKeyFieldName);
 
     Map<CompositionKey, Set<CompositionValue<? extends M>>> getCompositionMap();
+
+    /**
+     * 合并
+     *
+     * @param distinct 是否去重
+     */
+    Source<D, S, M, DF, VF> merge(boolean distinct);
+
+
+    boolean isMerge();
+
+    boolean isDistinct();
 }

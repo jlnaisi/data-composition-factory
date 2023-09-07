@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  * @author zhangjinyu
  * @since 2023-08-09
  */
-public class SingleSource<D, S> implements Source<D, S, S, FieldFunction<D, ?>, FieldFunction<S, ?>> {
+public class SingleSource<D, S> extends AbstractSource<D, S, S, FieldFunction<D, ?>, FieldFunction<S, ?>> {
     private final List<SourceKeyMap<D, S, S, FieldFunction<D, ?>, FieldFunction<S, ?>>> sourceKeyMapList;
     S source;
     private Map<String, Field> sourceFieldMap;
