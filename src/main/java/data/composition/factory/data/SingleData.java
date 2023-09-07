@@ -1,6 +1,5 @@
 package data.composition.factory.data;
 
-import cn.hutool.core.collection.CollUtil;
 import data.composition.factory.source.Source;
 import data.composition.factory.util.ReflectUtil;
 
@@ -42,7 +41,7 @@ public class SingleData<D> extends AbstractData<D, D> {
 
     @Override
     public void composition() {
-        if (Objects.isNull(data) || CollUtil.isEmpty(sourceList)) {
+        if (Objects.isNull(data) || sourceList.isEmpty()) {
             return;
         }
         if (Objects.nonNull(getPredicates())) {

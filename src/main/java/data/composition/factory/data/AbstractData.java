@@ -4,7 +4,6 @@ import data.composition.factory.bean.CompositionKey;
 import data.composition.factory.bean.CompositionValue;
 import data.composition.factory.source.Source;
 import data.composition.factory.util.ReflectUtil;
-import lombok.Getter;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -14,7 +13,6 @@ import java.util.function.Predicate;
 /**
  * @author guanguan
  */
-@Getter
 public abstract class AbstractData<D, C> implements Data<D, C> {
     private List<Predicate<? super D>> predicates;
 
@@ -31,6 +29,11 @@ public abstract class AbstractData<D, C> implements Data<D, C> {
         return this;
     }
 
+
+    public List<Predicate<? super D>> getPredicates() {
+        return predicates;
+    }
+
     @SuppressWarnings("unchecked")
     protected void execute(Map<String, Field> dataFiledNameMap, D data) {
         for (Source<D, ?, ?, ?, ?> source : getSourceList()) {
@@ -42,7 +45,7 @@ public abstract class AbstractData<D, C> implements Data<D, C> {
                     Map<Object, ?> valueGroupBy = compositionValue.getValueGroupBy();
                     Field sourceValuefield = source.getSourceFieldMap().get(compositionValue.getSourceValueFieldName());
                     Field dataValueField = dataFiledNameMap.get(compositionValue.getDataValueFieldName());
-                    List<?> values = ReflectUtil.unfold(sourceValuefield, valueGroupBy.get(fieldValue));
+                    Object values = ReflectUtil.unfold(sourceValuefield, valueGroupBy.get(fieldValue), source.isMerge(), source.isDistinct());
                     if (Objects.isNull(values)) {
                         break;
                     }

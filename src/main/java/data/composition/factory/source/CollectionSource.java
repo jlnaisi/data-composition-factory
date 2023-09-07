@@ -1,6 +1,5 @@
 package data.composition.factory.source;
 
-import cn.hutool.core.collection.CollUtil;
 import data.composition.factory.bean.CompositionKey;
 import data.composition.factory.bean.CompositionValue;
 import data.composition.factory.function.FieldFunction;
@@ -19,7 +18,7 @@ import java.util.stream.Stream;
  * @author zhangjinyu
  * @since 2023-07-25
  */
-public class CollectionSource<D, S> implements Source<D, S, Collection<S>, FieldFunction<D, ?>, FieldFunction<S, ?>> {
+public class CollectionSource<D, S> extends AbstractSource<D, S, Collection<S>, FieldFunction<D, ?>, FieldFunction<S, ?>> {
     private final List<SourceKeyMap<D, S, Collection<S>, FieldFunction<D, ?>, FieldFunction<S, ?>>> sourceKeyMapList;
     Collection<S> source;
     private Map<String, Field> sourceFieldMap;
@@ -48,7 +47,7 @@ public class CollectionSource<D, S> implements Source<D, S, Collection<S>, Field
 
     @Override
     public boolean enabled() {
-        return CollUtil.isNotEmpty(source);
+        return Objects.nonNull(source) && !source.isEmpty();
     }
 
     @Override
@@ -80,7 +79,7 @@ public class CollectionSource<D, S> implements Source<D, S, Collection<S>, Field
             for (Predicate<S> predicate : predicates) {
                 stream = stream.filter(predicate);
             }
-            source = stream.toList();
+            source = stream.collect(Collectors.toList());
         }
         if (source.isEmpty()) {
             return Optional.empty();
@@ -92,7 +91,7 @@ public class CollectionSource<D, S> implements Source<D, S, Collection<S>, Field
     public Map<String, Field> getSourceFieldMap() {
         if (Objects.isNull(sourceFieldMap)) {
             Optional<Collection<S>> sourceData = getSourceData();
-            sourceFieldMap = sourceData.map(s -> ReflectUtil.getStreamCacheFields(CollUtil.getFirst(s).getClass(), true, field -> field.setAccessible(true)).collect(Collectors.toMap(Field::getName, v -> v))).orElse(Collections.emptyMap());
+            sourceFieldMap = sourceData.map(s -> ReflectUtil.getStreamCacheFields(s.iterator().next().getClass(), true, field -> field.setAccessible(true)).collect(Collectors.toMap(Field::getName, v -> v))).orElse(Collections.emptyMap());
         }
         return sourceFieldMap;
     }

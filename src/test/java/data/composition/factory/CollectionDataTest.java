@@ -1,7 +1,5 @@
 package data.composition.factory;
 
-import cn.hutool.core.util.RandomUtil;
-import com.google.gson.Gson;
 import data.composition.factory.source.CollectionSource;
 
 import java.util.ArrayList;
@@ -15,8 +13,8 @@ import java.util.function.Predicate;
  */
 public class CollectionDataTest {
     public static void main(String[] args) {
-//        collectSourceTest();
-        singleSourceTest();
+        collectSourceTest();
+//        singleSourceTest();
     }
 
     private static void singleSourceTest() {
@@ -35,9 +33,9 @@ public class CollectionDataTest {
         for (int i = 2; i <= 10; i++) {
             StudentScore studentScore = new StudentScore();
             studentScore.setStudentId(i);
-            studentScore.setName(new String(new char[]{RandomUtil.randomChinese(), RandomUtil.randomChinese(), RandomUtil.randomChinese()}));
+            studentScore.setName(new String("张三" + i));
             studentScore.setIndex(i == 2 ? null : Arrays.asList(i, i + 1));
-            studentScore.setScore(RandomUtil.randomNumbers(3));
+            studentScore.setScore(String.valueOf(i + 10));
             studentScores.add(studentScore);
         }
         DataCompositionFactory.data(students)
@@ -55,39 +53,47 @@ public class CollectionDataTest {
                         .build()
                 )
                 .composition();
-        System.out.println(new Gson().toJson(students));
+        System.out.println(students);
     }
 
     private static void collectSourceTest() {
         List<Student> students = new ArrayList<>();
         List<StudentScore> studentScores = new ArrayList<>();
-        for (int i = 1; i <= 100000; i++) {
+        StudentScore studentScore1 = new StudentScore();
+        studentScore1.setStudentId(1);
+        studentScore1.setName("张三" + 1);
+        studentScore1.setIndex(Arrays.asList(3, 4, 5, 1, 2));
+        studentScore1.setScore(String.valueOf(11));
+        studentScores.add(studentScore1);
+        for (int i = 1; i <= 1; i++) {
             Student student = new Student();
             student.setId(i);
             students.add(student);
             StudentScore studentScore = new StudentScore();
             studentScore.setStudentId(i);
-            studentScore.setName(new String(new char[]{RandomUtil.randomChinese(), RandomUtil.randomChinese(), RandomUtil.randomChinese()}));
-            studentScore.setIndex(i == 2 ? null : Arrays.asList(i, i + 1));
-            studentScore.setScore(RandomUtil.randomNumbers(3));
+            studentScore.setName(new String("张三" + i));
+            studentScore.setIndex(Arrays.asList(i, i + 1));
+            studentScore.setScore(String.valueOf(i + 10));
             studentScores.add(studentScore);
         }
-        collectSourceTest(students, studentScores);
-        collectSourceTest(students, studentScores);
-        collectSourceTest(students, studentScores);
-        collectSourceTest(students, studentScores);
-        collectSourceTest(students, studentScores);
-        collectSourceTest(students, studentScores);
-        collectSourceTest(students, studentScores);
-        collectSourceTest(students, studentScores);
-        collectSourceTest(students, studentScores);
+//        collectSourceTest(students, studentScores);
+//        collectSourceTest(students, studentScores);
+//        collectSourceTest(students, studentScores);
+//        collectSourceTest(students, studentScores);
+//        collectSourceTest(students, studentScores);
+//        collectSourceTest(students, studentScores);
+//        collectSourceTest(students, studentScores);
+//        collectSourceTest(students, studentScores);
+//        collectSourceTest(students, studentScores);
         collectSourceTest(students, studentScores);
         System.out.println(students);
     }
 
     private static void collectSourceTest(List<Student> students, List<StudentScore> studentScores) {
         long l = System.currentTimeMillis();
-        DataCompositionFactory.data(students).source(CollectionSource.data(studentScores, Student.class)
+        DataCompositionFactory.data(students)
+                .source(CollectionSource.data(studentScores, Student.class)
+                        .merge(true)
                 .key(Student::getId, StudentScore::getStudentId)
                 .value(Student::getName, StudentScore::getName)
                 .value(Student::getScore, StudentScore::getScore)

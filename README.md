@@ -24,6 +24,11 @@
   > 1.实现单个对象数据组装<br>
   > 2.增加数据和数据源需要组装的数据的过滤
 
+
+- 2023-09-07
+  > 版本: 1.1.1<br>
+  > 新增 source 增加merge distinct逻辑(修复原逻辑)
+
 ### 安装
 
 - 最新Maven依赖
@@ -31,7 +36,7 @@
       <dependency>
         <groupId>cn.jlnaisi</groupId>
         <artifactId>data-composition-factory</artifactId>
-        <version>1.1.0</version>
+        <version>1.1.1</version>
       </dependency>
     ```
   考虑到非强制依赖性，因此hutool需要用户自行引入：
