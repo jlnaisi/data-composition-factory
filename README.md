@@ -16,7 +16,6 @@
 |:----------:|:---:|:----:|
 |     集合     |  √  |  √   |
 |    单个对象    |  √  | √  | 
-|    Map     | 实现中 | 实现中  | 
 
 ### 历史
 - 2023-09-04 
@@ -40,15 +39,7 @@
         <version>1.1.1</version>
       </dependency>
     ```
-  考虑到非强制依赖性，因此hutool需要用户自行引入：
-  ```maven
-  <dependency>
-    <groupId>cn.hutool</groupId>
-    <artifactId>hutool-core</artifactId>
-    <version>请参考本项目pom里的具体依赖</version>
-  </dependency>
-  ```
-  > 说明 本项目pom内的hutool依赖scope级别为provided
+   从1.1.1版本开始,无任何三方依赖
 
 ### 示例
 
