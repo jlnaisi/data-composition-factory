@@ -1,12 +1,11 @@
 package data.composition.factory.function;
 
-import java.io.Serializable;
-import java.util.function.Function;
+import cn.hutool.core.lang.func.Func1;
 
 /**
- * @author ZhangJinyu
- * @since 2022-09-21
+ * @author zhangjinyu
+ * @since 2023-10-19
  */
 @FunctionalInterface
-public interface FieldFunction<A, R> extends Function<A, R>, Serializable {
+public interface FieldFunction<T, R> extends Func1<T, R> {
 }
