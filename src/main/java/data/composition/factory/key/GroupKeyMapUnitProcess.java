@@ -8,9 +8,9 @@ import data.composition.factory.mapper.GroupMapperProcess;
  * @since 2023-10-20
  */
 public interface GroupKeyMapUnitProcess<T, R> {
-    GroupKeyMapUnitProcessImpl<T, R> dataField(FieldFunction<T, ?> dataFieldFunction);
+    GroupKeyMapUnitProcessImpl<T, R> dataField(FieldFunction<T, ?>... dataFieldFunction);
 
-    GroupKeyMapUnitProcessImpl<T, R> sourceField(FieldFunction<R, ?> sourceFieldFunction);
+    GroupKeyMapUnitProcessImpl<T, R> sourceField(FieldFunction<R, ?>... sourceFieldFunction);
 
     GroupMapperProcess<T, R> paired();
 }

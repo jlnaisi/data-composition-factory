@@ -12,6 +12,7 @@ import java.util.List;
 public class StudentDto {
     private Long id;
     private Long schoolId;
+    private Long subjectId;
     private String name;
     private String schoolName;
     private String no;

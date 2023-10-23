@@ -8,9 +8,11 @@ import data.composition.factory.mapper.SingleMapperProcess;
  * @since 2023-10-20
  */
 public interface KeyMapUnitProcess<T,R> {
-    KeyMapUnitProcessImpl<T, R> dataField(FieldFunction<T, ?> dataFieldFunction);
+    @SuppressWarnings("vararg")
+    KeyMapUnitProcessImpl<T, R> dataField(FieldFunction<T, ?>... dataFieldFunction);
 
-    KeyMapUnitProcessImpl<T, R> sourceField(FieldFunction<R, ?> sourceFieldFunction);
+    @SuppressWarnings("vararg")
+    KeyMapUnitProcessImpl<T, R> sourceField(FieldFunction<R, ?>... sourceFieldFunction);
 
     SingleMapperProcess<T, R> paired();
 }

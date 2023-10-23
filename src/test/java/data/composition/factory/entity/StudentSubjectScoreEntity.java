@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 public class StudentSubjectScoreEntity {
     private Long id;
     private Long studentId;
+    private Long schoolId;
     private Long subjectId;
     private BigDecimal score;
 }

@@ -14,6 +14,7 @@ import data.composition.factory.pipeline.FactoryPipelineImpl;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -93,7 +94,7 @@ public class SourceProcessImpl<T, R> implements SourceProcessor<T, R> {
             singleMapper = new SingleMapperProcessorImpl<>(factoryPipeline);
         }
         KeyMapUnitProcessImpl<T, R> keyMapUnitProcess = new KeyMapUnitProcessImpl<>(singleMapper);
-        mappingKey = keyMapUnitProcess.getMappingKey();
+        keyMapUnitProcess.mappingKeyCreate(trMappingKey -> mappingKey = trMappingKey);
         return keyMapUnitProcess;
     }
 
@@ -103,7 +104,7 @@ public class SourceProcessImpl<T, R> implements SourceProcessor<T, R> {
             groupMapper = new GroupSingleMapperProcessorImpl<>(factoryPipeline);
         }
         GroupKeyMapUnitProcessImpl<T, R> keyMapUnitProcess = new GroupKeyMapUnitProcessImpl<>(groupMapper);
-        mappingKey = keyMapUnitProcess.getMappingKey();
+        keyMapUnitProcess.mappingKeyCreate(trMappingKey -> mappingKey = trMappingKey);
         return keyMapUnitProcess;
     }
 }

@@ -5,7 +5,9 @@ import data.composition.factory.function.FieldFunction;
 import data.composition.factory.mapper.SingleMapperProcess;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * @author zhangjinyu
@@ -22,24 +24,30 @@ public class KeyMapUnitProcessImpl<T, R> implements KeyMapUnitProcess<T, R>, Key
         this.sourceFieldFunctions = new ArrayList<>();
     }
 
+    private Consumer<MappingKey<T, R>> consumer;
+
     @Override
-    public KeyMapUnitProcessImpl<T, R> dataField(FieldFunction<T, ?> dataFieldFunction) {
-        this.dataFieldFunctions.add(dataFieldFunction);
+    @SafeVarargs
+    public final KeyMapUnitProcessImpl<T, R> dataField(FieldFunction<T, ?>... dataFieldFunction) {
+        this.dataFieldFunctions.addAll(Arrays.asList(dataFieldFunction));
         return this;
     }
 
     @Override
-    public KeyMapUnitProcessImpl<T, R> sourceField(FieldFunction<R, ?> sourceFieldFunction) {
-        this.sourceFieldFunctions.add(sourceFieldFunction);
+    @SafeVarargs
+    public final KeyMapUnitProcessImpl<T, R> sourceField(FieldFunction<R, ?>... sourceFieldFunction) {
+        this.sourceFieldFunctions.addAll(Arrays.asList(sourceFieldFunction));
         return this;
     }
+
     @Override
-    public MappingKey<T, R> getMappingKey() {
-        return MappingKey.create(dataFieldFunctions, sourceFieldFunctions);
+    public void mappingKeyCreate(Consumer<MappingKey<T, R>> consumer) {
+        this.consumer = consumer;
     }
 
     @Override
     public SingleMapperProcess<T, R> paired() {
+        consumer.accept(MappingKey.create(this.dataFieldFunctions, this.sourceFieldFunctions));
         return singleMapperProcess;
     }
 }
